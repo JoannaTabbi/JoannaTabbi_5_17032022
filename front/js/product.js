@@ -28,6 +28,8 @@ fetch(`http://localhost:3000/api/products/${productId}`)
     });
 
     document.getElementById("quantity").setAttribute("value", "1");
+
+    addToCart(product);
   })
 
   .catch((err) => {
@@ -36,46 +38,51 @@ fetch(`http://localhost:3000/api/products/${productId}`)
 
 // ------------------- add to cart section -------------------------
 
-// creates a cart list in the local storage, converts array into string
+// saves a cart list in the local storage, converts array into string
 
-let cart = [];
-localStorage.setItem("cart", JSON.stringify(cart));
+let setCart = (cart) => localStorage.setItem("cart", JSON.stringify(cart));
 
-//gets the cart & converts to array
+//gets the cart & converts it to an array
 
-let getCart = () => JSON.perse(localStorage.getItem("cart"));
+let getCart = () => {
+  let cart = localStorage.getItem("cart");
+  if (cart == null) {
+    return [];
+  } else {
+    return JSON.parse(cart);
+  }
+};
+// checks if the product already exists in the cart
 
-// adds products to the cart
-
-addToCart = (product) => {
+productMatch = (product) => {
   let cart = getCart();
-  let productFound = cart.find((p) => p.id == product.id);
-  let colorFound = cart.find((q) => q.color == product.color);
+  let productFound = cart.find((p) => p._id == product._id);
+  let colorFound = cart.find((q) => q.colors == product.colors);
   if (productFound != undefined && colorFound != undefined) {
-    productFound.quantity++;
+    productFound.quantity += product.quantity;
   } else {
-    product.quantity = 1;
+    product.quantity = Number(document.getElementById("quantity").value);
+    cart.push(product);
   }
-}; // terminer la fonction
+  setCart(cart);
+};
 
-// creates chosen product (id, color option and quantity) while clicking on the add to cart button
+// adds the product to the cart while clicking on the add to cart button
 
-const addToCartButton = document.getElementById("addToCart");
-addToCartButton.addEventListener("click", (event) => {
-  event.preventDefault();
-  const idChosen = `${productId}`;
-  const colorChosen = document.getElementById("colors").value;
-  const quantityChosen = document.getElementById("quantity").value;
-  const productChosen = [
-    { id: idChosen },
-    { color: colorChosen },
-    { quantity: quantityChosen },
-  ];
-  if (colorChosen === "") {
-    document.getElementById("colors").style.backgroundColor = "red";
-    //enlever la couleur rouge dès que la couleur est choisie, sans attendre le click au bouton panier.
-  } else {
-    document.getElementById("colors").style.borderColor = "#767676";
-    console.log(productChosen);
-  }
-});
+function addToCart(product) {
+  const addToCartButton = document.getElementById("addToCart");
+  addToCartButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    let selectedColor = document.getElementById("colors").value;
+    product.colors = selectedColor;
+    product.quantity = Number(document.getElementById("quantity").value);
+    if (product.colors === "") {
+      document.getElementById("colors").style.color = "red";
+      //enlever la couleur rouge dès que la couleur est choisie, sans attendre le click au bouton panier.
+    } else {
+      document.getElementById("colors").style.color = "#767676";
+      console.log(product);
+      productMatch(product);
+    }
+  });
+}
