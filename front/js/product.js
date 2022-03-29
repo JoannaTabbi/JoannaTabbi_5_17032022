@@ -68,7 +68,7 @@ productMatch = (product) => {
   setCart(cart);
 };
 
-// adds the product to the cart while clicking on the add to cart button
+// adds the product to the cart while clicking on the add-to-cart button
 
 addToCart = (product) => {
   const addToCartButton = document.getElementById("addToCart");
@@ -80,7 +80,7 @@ addToCart = (product) => {
     if (product.colors === "") {
       document.getElementById("colors").style.color = "red";
     } else {
-      document.getElementById("colors").style.color = "#767676";
+      document.getElementById("colors").style.color = "var(--footer-secondary-color)";
       productMatch(product);
     }
   });
