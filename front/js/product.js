@@ -55,10 +55,10 @@ let getCart = () => {
 // checks if the product already exists in the cart
 
 productMatch = (product) => {
+
   let cart = getCart();
-  let productFound = cart.find((p) => p._id == product._id);
-  let colorFound = cart.find((q) => q.colors == product.colors);
-  if (productFound != undefined && colorFound != undefined) {
+  let productFound = cart.find((p) => p._id == product._id && p.colors == product.colors);
+  if (productFound != undefined) {
     productFound.quantity += product.quantity;
   } else {
     product.quantity = Number(document.getElementById("quantity").value);
@@ -78,7 +78,6 @@ function addToCart(product) {
     product.quantity = Number(document.getElementById("quantity").value);
     if (product.colors === "") {
       document.getElementById("colors").style.color = "red";
-      //enlever la couleur rouge dès que la couleur est choisie, sans attendre le click au bouton panier.
     } else {
       document.getElementById("colors").style.color = "#767676";
       console.log(product);
