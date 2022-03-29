@@ -1,5 +1,9 @@
+// gets the id of one product
+
 const urlSearchParams = new URLSearchParams(window.location.search);
 const productId = urlSearchParams.get("id");
+
+// gets the product data & implements the data into product page
 
 fetch(`http://localhost:3000/api/products/${productId}`)
   .then((res) => {
@@ -24,8 +28,60 @@ fetch(`http://localhost:3000/api/products/${productId}`)
     });
 
     document.getElementById("quantity").setAttribute("value", "1");
+
+    addToCart(product);
   })
-  
+
   .catch((err) => {
     alert(`Une erreur est survenue: ${err}`);
   });
+
+// ------------------- add to cart section -------------------------
+
+// saves a cart list in the local storage, converts array into string
+
+let setCart = (cart) => localStorage.setItem("cart", JSON.stringify(cart));
+
+//gets the cart & converts it to an array
+
+let getCart = () => {
+  let cart = localStorage.getItem("cart");
+  if (cart == null) {
+    return [];
+  } else {
+    return JSON.parse(cart);
+  }
+};
+// checks if the product already exists in the cart
+
+productMatch = (product) => {
+  let cart = getCart();
+  let productFound = cart.find(
+    (p) => p._id == product._id && p.colors == product.colors
+  );
+  if (productFound != undefined) {
+    productFound.quantity += product.quantity;
+  } else {
+    product.quantity = Number(document.getElementById("quantity").value);
+    cart.push(product);
+  }
+  setCart(cart);
+};
+
+// adds the product to the cart while clicking on the add-to-cart button
+
+addToCart = (product) => {
+  const addToCartButton = document.getElementById("addToCart");
+  addToCartButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    let selectedColor = document.getElementById("colors").value;
+    product.colors = selectedColor;
+    product.quantity = Number(document.getElementById("quantity").value);
+    if (product.colors === "") {
+      document.getElementById("colors").style.color = "red";
+    } else {
+      document.getElementById("colors").style.color = "var(--footer-secondary-color)";
+      productMatch(product);
+    }
+  });
+};
