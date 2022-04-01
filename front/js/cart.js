@@ -1,4 +1,4 @@
-// displays products details at the cart page
+//gets the products information frop API
 
 fetch("http://localhost:3000/api/products")
   .then((res) => {
@@ -9,7 +9,9 @@ fetch("http://localhost:3000/api/products")
   .then((products) => {
     let cart = getCart();
     let cartItemsHtml = "";
-    let cartProductPrice = 0;
+    let totalProductPrice = 0;
+
+    // recovers cart products name, image and price from API and displays products details, total quantity and total price
 
     cart.forEach((cartItem) => {
       products.forEach((product) => {
@@ -21,7 +23,7 @@ fetch("http://localhost:3000/api/products")
           <div class="cart__item__content">
             <div class="cart__item__content__description">
               <h2>${product.name}</h2>
-              <p>${cartItem.colors}</p>
+              <p>${cartItem.color}</p>
               <p>${product.price} €</p>
             </div>
             <div class="cart__item__content__settings">
@@ -36,16 +38,14 @@ fetch("http://localhost:3000/api/products")
           </div>
         </article>`;
 
-          // displays total product price
+          document.getElementById("cart__items").innerHTML = cartItemsHtml;
+          document.getElementById("totalQuantity").innerText = totalQuantity();
 
-          cartProductPrice += cartItem.quantity * product.price;
-          document.getElementById("totalPrice").innerText = cartProductPrice;
-        }
+          totalProductPrice += cartItem.quantity * product.price;
+          document.getElementById("totalPrice").innerText = totalProductPrice;
+        };
       });
     });
-
-    document.getElementById("cart__items").innerHTML = cartItemsHtml;
-    document.getElementById("totalQuantity").innerText = totalQuantity();
   })
 
   .catch((err) => {
@@ -64,7 +64,7 @@ let getCart = () => {
   }
 };
 
-// obtains total product quantity
+// calculates total product quantity
 
 let totalQuantity = () => {
   let cart = getCart();
