@@ -66,7 +66,7 @@ productMatch = (product) => {
     product.quantity = Number(document.getElementById("quantity").value);
     
     const productInCart = {
-     color : product.colors,
+     colors : product.colors,
      _id : product._id,
      quantity : product.quantity
     } 

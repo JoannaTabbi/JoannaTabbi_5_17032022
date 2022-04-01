@@ -10,26 +10,43 @@ fetch("http://localhost:3000/api/products")
     let cart = getCart();
     let cartItemsHtml = "";
     let totalProductPrice = 0;
+    let totalProductQuantity = 0;
 
-    // recovers cart products name, image and price from API and displays products details, total quantity and total price
+    // reconstructs cart products with name, image and price from API
 
     cart.forEach((cartItem) => {
       products.forEach((product) => {
         if (product._id == cartItem._id) {
-          cartItemsHtml += ` <article class="cart__item" data-id="{product-ID}" data-color="{product-color}">
+          let productFromCart = {
+            _id: product._id,
+            name: product.name,
+            colors: cartItem.colors,
+            imageUrl: product.imageUrl,
+            altTxt: product.altTxt,
+            price: product.price,
+            quantity: cartItem.quantity,
+            totalPrice: function () {
+              let x = this.quantity * this.price;
+              return x;
+            },
+          };
+          // displays products details
+
+          document.getElementById("cart__items").innerHTML =
+            cartItemsHtml += ` <article class="cart__item" data-id="{product-ID}" data-color="{product-color}">
           <div class="cart__item__img">
-            <img src="${product.imageUrl}" alt="${product.altTxt}">
+            <img src="${productFromCart.imageUrl}" alt="${productFromCart.altTxt}">
           </div>
           <div class="cart__item__content">
             <div class="cart__item__content__description">
-              <h2>${product.name}</h2>
-              <p>${cartItem.color}</p>
-              <p>${product.price} €</p>
+              <h2>${productFromCart.name}</h2>
+              <p>${productFromCart.colors}</p>
+              <p>${productFromCart.price} €</p>
             </div>
             <div class="cart__item__content__settings">
               <div class="cart__item__content__settings__quantity">
                 <p>Qté : </p>
-                <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${cartItem.quantity}">
+                <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${productFromCart.quantity}">
               </div>
               <div class="cart__item__content__settings__delete">
                 <p class="deleteItem">Supprimer</p>
@@ -38,12 +55,13 @@ fetch("http://localhost:3000/api/products")
           </div>
         </article>`;
 
-          document.getElementById("cart__items").innerHTML = cartItemsHtml;
-          document.getElementById("totalQuantity").innerText = totalQuantity();
+          // displays total quantity and total price
 
-          totalProductPrice += cartItem.quantity * product.price;
-          document.getElementById("totalPrice").innerText = totalProductPrice;
-        };
+          document.getElementById("totalQuantity").innerText =
+            totalProductQuantity += productFromCart.quantity;
+          document.getElementById("totalPrice").innerText = totalProductPrice +=
+            productFromCart.totalPrice();
+        }
       });
     });
   })
@@ -62,15 +80,4 @@ let getCart = () => {
   } else {
     return JSON.parse(cart);
   }
-};
-
-// calculates total product quantity
-
-let totalQuantity = () => {
-  let cart = getCart();
-  let cartProductQuantity = 0;
-  for (let cartItem of cart) {
-    cartProductQuantity += cartItem.quantity;
-  }
-  return cartProductQuantity;
 };
