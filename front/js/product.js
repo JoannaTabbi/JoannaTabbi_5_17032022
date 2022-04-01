@@ -38,13 +38,9 @@ fetch(`http://localhost:3000/api/products/${productId}`)
 
 // ------------------- add to cart section -------------------------
 
-// saves a cart list in the local storage, converts array into string
-
-let setCart = (cart) => localStorage.setItem("cart", JSON.stringify(cart));
-
 //gets the cart & converts it to an array
 
-let getCart = () => {
+const getCart = () => {
   let cart = localStorage.getItem("cart");
   if (cart == null) {
     return [];
@@ -52,6 +48,11 @@ let getCart = () => {
     return JSON.parse(cart);
   }
 };
+
+// saves a cart list in the local storage, converts array into string
+
+const setCart = (cart) => localStorage.setItem("cart", JSON.stringify(cart));
+
 // checks if the product already exists in the cart
 
 productMatch = (product) => {
@@ -63,7 +64,13 @@ productMatch = (product) => {
     productFound.quantity += product.quantity;
   } else {
     product.quantity = Number(document.getElementById("quantity").value);
-    cart.push(product);
+    
+    const productInCart = {
+     colors : product.colors,
+     _id : product._id,
+     quantity : product.quantity
+    } 
+    cart.push(productInCart); 
   }
   setCart(cart);
 };
