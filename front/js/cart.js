@@ -1,46 +1,59 @@
-//gets the products information frop API
+// gets cart content
 
-fetch("http://localhost:3000/api/products")
-  .then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-  })
-  .then((products) => {
-    let cart = getCart();
-    let cartItemsHtml = "";
-    let totalProductPrice = 0;
-    let totalProductQuantity = 0;
+let getCart = () => {
+  let cart = localStorage.getItem("cart");
+  if (cart == null) {
+    return [];
+  } else {
+    return JSON.parse(cart);
+  }
+};
 
-    // reconstructs cart products with name, image and price from API
+let cartItems = getCart();
+let cartItemsHtml = "";
+let totalProductPrice = 0;
+let totalProductQuantity = 0;
 
-    cart.forEach((cartItem) => {
-      products.forEach((product) => {
-        if (product._id == cartItem._id) {
-          let productFromCart = {
-            _id: product._id,
-            name: product.name,
-            colors: cartItem.colors,
-            imageUrl: product.imageUrl,
-            altTxt: product.altTxt,
-            price: product.price,
-            quantity: cartItem.quantity,
-            totalPrice: function () {
-              let x = this.quantity * this.price;
-              return x;
-            },
-          };
-          // displays products details
+cartItems.forEach((cartItem) => {
+  const productId = cartItem._id;
+  console.log(productId);
 
-          document.getElementById("cart__items").innerHTML =
-            cartItemsHtml += ` <article class="cart__item" data-id="{product-ID}" data-color="{product-color}">
+  //gets the product information frop API
+
+  fetch(`http://localhost:3000/api/products/${productId}`)
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      }
+    })
+    .then((product) => {
+
+      // reconstructs cart product with name, image and price from API
+
+      let productFromCart = {
+        _id: product._id,
+        name: product.name,
+        color: cartItem.color,
+        imageUrl: product.imageUrl,
+        altTxt: product.altTxt,
+        price: product.price,
+        quantity: cartItem.quantity,
+        totalPrice: function () {
+          let x = this.quantity * this.price;
+          return x;
+        },
+      };
+console.log(productFromCart);
+       
+document.getElementById("cart__items").innerHTML = 
+        cartItemsHtml += ` <article class="cart__item" data-id="{product-ID}" data-color="{product-color}">
           <div class="cart__item__img">
             <img src="${productFromCart.imageUrl}" alt="${productFromCart.altTxt}">
           </div>
           <div class="cart__item__content">
             <div class="cart__item__content__description">
               <h2>${productFromCart.name}</h2>
-              <p>${productFromCart.colors}</p>
+              <p>${productFromCart.color}</p>
               <p>${productFromCart.price} €</p>
             </div>
             <div class="cart__item__content__settings">
@@ -55,29 +68,39 @@ fetch("http://localhost:3000/api/products")
           </div>
         </article>`;
 
-          // displays total quantity and total price
+      // displays total quantity and total price
 
-          document.getElementById("totalQuantity").innerText =
-            totalProductQuantity += productFromCart.quantity;
-          document.getElementById("totalPrice").innerText = totalProductPrice +=
-            productFromCart.totalPrice();
-        }
-      });
+      document.getElementById("totalQuantity").innerText =
+        totalProductQuantity += productFromCart.quantity;
+      document.getElementById("totalPrice").innerText = totalProductPrice +=
+        productFromCart.totalPrice();
+      
+    })
+
+    .catch((err) => {
+      const items = document.getElementById("cart__items");
+      items.innerHTML = `Une erreur est survenue: ${err}`;
     });
-  })
-
-  .catch((err) => {
-    const items = document.getElementById("cart__items");
-    items.innerHTML = `Une erreur est survenue: ${err}`;
-  });
-
-// gets cart content
-
-let getCart = () => {
-  let cart = localStorage.getItem("cart");
-  if (cart == null) {
-    return [];
-  } else {
-    return JSON.parse(cart);
+});
+/*
+let totalQuantity = () => {
+  let cart = getCart();
+  let cartProductQuantity = 0;
+  for (let product of cart) {
+    cartProductQuantity += product.quantity;
   }
+  return cartProductQuantity;
 };
+document.getElementById("totalQuantity").innerText = totalQuantity();
+
+// display total product price
+
+let totalPrice = () => {
+  let cart = getCart();
+  let cartProductPrice = 0;
+  for (let product of cart) {
+    cartProductPrice += product.quantity * product.price;
+  }
+  return cartProductPrice;
+};
+document.getElementById("totalPrice").innerText = totalPrice(); */

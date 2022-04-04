@@ -58,7 +58,7 @@ const setCart = (cart) => localStorage.setItem("cart", JSON.stringify(cart));
 productMatch = (product) => {
   let cart = getCart();
   let productFound = cart.find(
-    (p) => p._id == product._id && p.colors == product.colors
+    (p) => p._id == product._id && p.color == product.colors
   );
   if (productFound != undefined) {
     productFound.quantity += product.quantity;
@@ -66,7 +66,7 @@ productMatch = (product) => {
     product.quantity = Number(document.getElementById("quantity").value);
     
     const productInCart = {
-     colors : product.colors,
+     color : product.colors,
      _id : product._id,
      quantity : product.quantity
     } 
