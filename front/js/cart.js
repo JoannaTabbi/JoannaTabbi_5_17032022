@@ -1,15 +1,6 @@
-// gets cart content
+import * as index from "./index";
 
-let getCart = () => {
-  let cart = localStorage.getItem("cart");
-  if (cart == null) {
-    return [];
-  } else {
-    return JSON.parse(cart);
-  }
-};
-
-let cartItems = getCart();
+let cartItems = index.getCart();
 let cartItemsHtml = "";
 let totalProductPrice = 0;
 let totalProductQuantity = 0;
