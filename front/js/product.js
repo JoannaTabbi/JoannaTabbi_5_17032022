@@ -53,13 +53,14 @@ const productMatch = (product) => {
     product.quantity = Number(document.getElementById("quantity").value);
 
     const productInCart = {
+      name: product.name,
       color: product.colors,
       _id: product._id,
       quantity: product.quantity,
     };
     cart.push(productInCart);
   }
-  index.setCart(cart);
+  index.setCart(index.orderedList(cart));
 };
 
 // adds the product to the cart while clicking on the add-to-cart button
