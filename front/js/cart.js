@@ -1,6 +1,8 @@
-import * as index from "./index";
+import * as index from "./index.js";
 
-let cartItems = index.getCart();
+// defines variables
+
+const cartItems = index.getCart();
 let cartItemsHtml = "";
 let totalProductPrice = 0;
 let totalProductQuantity = 0;
@@ -9,7 +11,7 @@ cartItems.forEach((cartItem) => {
   const productId = cartItem._id;
   console.log(productId);
 
-  //gets the product information frop API
+  //gets the product information from API
 
   fetch(`http://localhost:3000/api/products/${productId}`)
     .then((res) => {
@@ -18,7 +20,6 @@ cartItems.forEach((cartItem) => {
       }
     })
     .then((product) => {
-
       // reconstructs cart product with name, image and price from API
 
       let productFromCart = {
@@ -34,38 +35,10 @@ cartItems.forEach((cartItem) => {
           return x;
         },
       };
-console.log(productFromCart);
-       
-document.getElementById("cart__items").innerHTML = 
-        cartItemsHtml += ` <article class="cart__item" data-id="{product-ID}" data-color="{product-color}">
-          <div class="cart__item__img">
-            <img src="${productFromCart.imageUrl}" alt="${productFromCart.altTxt}">
-          </div>
-          <div class="cart__item__content">
-            <div class="cart__item__content__description">
-              <h2>${productFromCart.name}</h2>
-              <p>${productFromCart.color}</p>
-              <p>${productFromCart.price} €</p>
-            </div>
-            <div class="cart__item__content__settings">
-              <div class="cart__item__content__settings__quantity">
-                <p>Qté : </p>
-                <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${productFromCart.quantity}">
-              </div>
-              <div class="cart__item__content__settings__delete">
-                <p class="deleteItem">Supprimer</p>
-              </div>
-            </div>
-          </div>
-        </article>`;
 
-      // displays total quantity and total price
-
-      document.getElementById("totalQuantity").innerText =
-        totalProductQuantity += productFromCart.quantity;
-      document.getElementById("totalPrice").innerText = totalProductPrice +=
-        productFromCart.totalPrice();
-      
+      CartDetails(productFromCart);
+      totalQuantity(productFromCart);
+      totalPrice(productFromCart);
     })
 
     .catch((err) => {
@@ -73,25 +46,47 @@ document.getElementById("cart__items").innerHTML =
       items.innerHTML = `Une erreur est survenue: ${err}`;
     });
 });
-/*
-let totalQuantity = () => {
-  let cart = getCart();
-  let cartProductQuantity = 0;
-  for (let product of cart) {
-    cartProductQuantity += product.quantity;
-  }
-  return cartProductQuantity;
+
+// displays the details of each cart item
+
+let CartDetails = (product) => {
+  const itemCard = ` <article class="cart__item" data-id="{product-ID}" data-color="{product-color}">
+    <div class="cart__item__img">
+      <img src="${product.imageUrl}" alt="${product.altTxt}">
+    </div>
+    <div class="cart__item__content">
+      <div class="cart__item__content__description">
+        <h2>${product.name}</h2>
+        <p>${product.color}</p>
+        <p>${product.price} €</p>
+      </div>
+      <div class="cart__item__content__settings">
+        <div class="cart__item__content__settings__quantity">
+          <p>Qté : </p>
+          <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${product.quantity}">
+        </div>
+        <div class="cart__item__content__settings__delete">
+          <p class="deleteItem">Supprimer</p>
+        </div>
+      </div>
+    </div>
+  </article>`;
+
+  cartItemsHtml += itemCard;
+
+  document.getElementById("cart__items").innerHTML = cartItemsHtml;
 };
-document.getElementById("totalQuantity").innerText = totalQuantity();
+
+// displays total quantity
+
+let totalQuantity = (product) => {
+  document.getElementById("totalQuantity").innerText = totalProductQuantity +=
+    product.quantity;
+};
 
 // display total product price
 
-let totalPrice = () => {
-  let cart = getCart();
-  let cartProductPrice = 0;
-  for (let product of cart) {
-    cartProductPrice += product.quantity * product.price;
-  }
-  return cartProductPrice;
+let totalPrice = (product) => {
+  document.getElementById("totalPrice").innerText = totalProductPrice +=
+    product.totalPrice();
 };
-document.getElementById("totalPrice").innerText = totalPrice(); */

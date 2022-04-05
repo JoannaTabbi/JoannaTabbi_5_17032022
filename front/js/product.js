@@ -1,3 +1,5 @@
+import * as index from "./index.js";
+
 // gets the id of one product
 
 const urlSearchParams = new URLSearchParams(window.location.search);
@@ -38,25 +40,10 @@ fetch(`http://localhost:3000/api/products/${productId}`)
 
 // ------------------- add to cart section -------------------------
 
-//gets the cart & converts it to an array
-
-const getCart = () => {
-  let cart = localStorage.getItem("cart");
-  if (cart == null) {
-    return [];
-  } else {
-    return JSON.parse(cart);
-  }
-};
-
-// saves a cart list in the local storage, converts array into string
-
-const setCart = (cart) => localStorage.setItem("cart", JSON.stringify(cart));
-
 // checks if the product already exists in the cart
 
-productMatch = (product) => {
-  let cart = getCart();
+const productMatch = (product) => {
+  let cart = index.getCart();
   let productFound = cart.find(
     (p) => p._id == product._id && p.color == product.colors
   );
@@ -64,20 +51,20 @@ productMatch = (product) => {
     productFound.quantity += product.quantity;
   } else {
     product.quantity = Number(document.getElementById("quantity").value);
-    
+
     const productInCart = {
-     color : product.colors,
-     _id : product._id,
-     quantity : product.quantity
-    } 
-    cart.push(productInCart); 
+      color: product.colors,
+      _id: product._id,
+      quantity: product.quantity,
+    };
+    cart.push(productInCart);
   }
-  setCart(cart);
+  index.setCart(cart);
 };
 
 // adds the product to the cart while clicking on the add-to-cart button
 
-addToCart = (product) => {
+const addToCart = (product) => {
   const addToCartButton = document.getElementById("addToCart");
   addToCartButton.addEventListener("click", (event) => {
     event.preventDefault();
@@ -87,7 +74,8 @@ addToCart = (product) => {
     if (product.colors === "") {
       document.getElementById("colors").style.color = "red";
     } else {
-      document.getElementById("colors").style.color = "var(--footer-secondary-color)";
+      document.getElementById("colors").style.color =
+        "var(--footer-secondary-color)";
       productMatch(product);
     }
   });
