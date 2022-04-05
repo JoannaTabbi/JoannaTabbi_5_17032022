@@ -66,14 +66,14 @@ let CartDetails = (apiData, cartData) => {
 
 // displays total quantity
 
-let totalQuantity = (cartData) => {
+const totalQuantity = (cartData) => {
   totalProductQuantity += cartData.quantity;
   return totalProductQuantity;
 };
 
 // display total product price
 
-let totalPrice = (apiData, cartData) => {
+const totalPrice = (apiData, cartData) => {
   totalProductPrice += apiData.price * cartData.quantity;
   return totalProductPrice;
 };
