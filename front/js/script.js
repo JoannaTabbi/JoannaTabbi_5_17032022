@@ -7,7 +7,6 @@ fetch("http://localhost:3000/api/products")
   .then((products) => {
     let html = "";
     products.forEach((product) => {
-      console.log(product);
       html += ` <a href="./product.html?id=${product._id}">
         <article>
           <img src="${product.imageUrl}" alt="${product.altTxt}">
