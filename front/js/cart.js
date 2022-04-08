@@ -2,7 +2,7 @@ import * as index from "./index.js";
 
 // defines variables
 
-const cartItems = index.getCart();
+let cartItems = index.getCart();
 let cartItemsHtml = "";
 let totalProductPrice = 0;
 let totalProductQuantity = 0;
@@ -30,6 +30,9 @@ cartItems.forEach((cartItem) => {
         cartItem
       );
     })
+    .then(() => {
+        deleteFromCart();
+    })
 
     .catch((err) => {
       const items = document.getElementById("cart__items");
@@ -40,7 +43,7 @@ cartItems.forEach((cartItem) => {
 // displays the details of each cart item
 
 let CartDetails = (apiData, cartData) => {
-  cartItemsHtml += `<article class="cart__item" data-id="{product-ID}" data-color="{product-color}">
+  cartItemsHtml += `<article class="cart__item" data-id="${cartData._id}" data-color="${cartData.color}">
     <div class="cart__item__img">
       <img src="${apiData.imageUrl}" alt="${apiData.altTxt}">
     </div>
@@ -76,4 +79,32 @@ const totalQuantity = (cartData) => {
 const totalPrice = (apiData, cartData) => {
   totalProductPrice += apiData.price * cartData.quantity;
   return totalProductPrice;
+};
+
+// remove the cart item from the cart and from the page
+
+const deleteFromCart = () => {
+  const deleteItemButtons = document.querySelectorAll(".deleteItem");
+  deleteItemButtons.forEach((deleteItemButton) => {
+    deleteItemButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      const productToRemove = deleteItemButton.closest(".cart__item");
+      const productToRemoveId = productToRemove.dataset.id;
+      const productToRemoveColor = productToRemove.dataset.color;
+      itemsLeft(productToRemoveId, productToRemoveColor);
+      location.reload();
+    });
+  });
+};
+
+// updates the cart content after deleting an item
+
+const itemsLeft = (id, color) => {
+    let productFound = cartItems.find(
+        (p) => p._id == id && p.color == color);
+        if (productFound) {
+            cartItems = cartItems.filter(
+                (p) => p !== productFound);
+              return index.setCart(cartItems);
+        }
 };
