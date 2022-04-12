@@ -4,18 +4,15 @@ import * as index from "./index.js";
 
 let cartItems = index.getCart();
 let cartItemsHtml = "";
-let totalProductPrice = 0;
-let totalProductQuantity = 0;
 const cartItemsElement = document.getElementById("cart__items");
 const totalQuantityElement = document.getElementById("totalQuantity");
 const totalPriceElement = document.getElementById("totalPrice");
 
 cartItems.forEach((cartItem) => {
-  const productId = cartItem._id;
 
   //gets the product information from API
 
-  fetch(`http://localhost:3000/api/products/${productId}`)
+  fetch(`http://localhost:3000/api/products/${cartItem._id}`)
     .then((res) => {
       if (res.ok) {
         return res.json();
@@ -23,8 +20,6 @@ cartItems.forEach((cartItem) => {
     })
     .then((product) => {
       cartItemsElement.innerHTML = cartDetails(product, cartItem);
-      totalQuantityElement.innerText = totalQuantity(cartItem);
-      totalPriceElement.innerText = totalPrice(product, cartItem);
       deleteFromCart();
       updateQuantity();
     })
@@ -63,17 +58,36 @@ const cartDetails = (apiData, cartData) => {
 
 // displays total quantity
 
-const totalQuantity = (cartData) => {
-  totalProductQuantity += cartData.quantity;
-  return totalProductQuantity;
+const totalQuantity = () => {
+    let qty = 0;
+  cartItems.forEach((cartItem) => {
+   qty += cartItem.quantity;
+  });
+  totalQuantityElement.innerText = qty;
 };
+totalQuantity();
 
 // displays total product price
 
-const totalPrice = (apiData, cartData) => {
-  totalProductPrice += apiData.price * cartData.quantity;
-  return totalProductPrice;
+const totalPrice = () => {
+ let total = 0;
+ cartItems.forEach((cartItem) => {
+    fetch(`http://localhost:3000/api/products/${cartItem._id}`)
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      }
+    })
+    .then((product) => {
+      total += cartItem.quantity * product.price;
+      totalPriceElement.innerText = total;
+    })
+    .catch((err) => {
+      cartItemsElement.innerHTML = `Une erreur est survenue: ${err}`;
+    });
+ })
 };
+totalPrice();
 
 // removes the cart item from the cart and from the page
 
@@ -83,7 +97,7 @@ const deleteFromCart = () => {
     deleteItemButton.addEventListener("click", (event) => {
       event.preventDefault();
       const productToRemove = deleteItemButton.closest(".cart__item");
-      itemsLeft(productToRemove.dataset.id, productToRemove.dataset.color);
+      removeItem(productToRemove.dataset.id, productToRemove.dataset.color);
       location.reload();
     });
   });
@@ -91,7 +105,7 @@ const deleteFromCart = () => {
 
 // updates the cart content after deleting an item
 
-const itemsLeft = (id, color) => {
+const removeItem = (id, color) => {
   let productFound = cartItems.find((p) => p._id == id && p.color == color);
   if (productFound) {
     cartItems = cartItems.filter((p) => p !== productFound);
@@ -115,6 +129,8 @@ const updateQuantity = () => {
       if (productFound) {
         productFound.quantity = Number(updateQuantityInput.value);
         index.setCart(cartItems);
+        totalQuantity();
+        totalPrice();
       }
     });
   });
