@@ -43,11 +43,11 @@ fetch(`http://localhost:3000/api/products/${productId}`)
 // checks if the product already exists in the cart
 
 const productMatch = (product) => {
-  let cart = index.getCart();
-  let productFound = cart.find(
+  let cartItems = index.getCart();
+  let productFound = cartItems.find(
     (p) => p._id == product._id && p.color == product.colors
   );
-  if (productFound != undefined) {
+  if (productFound) {
     productFound.quantity += product.quantity;
   } else {
     product.quantity = Number(document.getElementById("quantity").value);
@@ -58,9 +58,9 @@ const productMatch = (product) => {
       _id: product._id,
       quantity: product.quantity,
     };
-    cart.push(productInCart);
+    cartItems.push(productInCart);
   }
-  index.setCart(index.orderedList(cart));
+  index.setCart(index.orderedList(cartItems));
 };
 
 // adds the product to the cart while clicking on the add-to-cart button
@@ -78,6 +78,17 @@ const addToCart = (product) => {
       document.getElementById("colors").style.color =
         "var(--footer-secondary-color)";
       productMatch(product);
+      confirmationMessage();
     }
   });
+};
+
+// displays the confirmation than the product has been added to the cart
+
+const confirmationMessage = () => {
+  const addToCartMessage = document.createElement("p");
+  addToCartMessage.setAttribute("class", "item__confirmationMessage");
+  addToCartMessage.innerText = "Votre produit a été ajouté au panier";
+  document.querySelector(".item__content").appendChild(addToCartMessage);
+  setTimeout('document.querySelector(".item__content").removeChild(document.querySelector(".item__confirmationMessage"))', 4000);
 };
