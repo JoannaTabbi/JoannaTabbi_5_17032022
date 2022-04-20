@@ -9,7 +9,6 @@ const totalQuantityElement = document.getElementById("totalQuantity");
 const totalPriceElement = document.getElementById("totalPrice");
 
 cartItems.forEach((cartItem) => {
-
   //gets the product information from API
 
   fetch(`http://localhost:3000/api/products/${cartItem._id}`)
@@ -59,9 +58,9 @@ const cartDetails = (apiData, cartData) => {
 // displays total quantity
 
 const totalQuantity = () => {
-    let qty = 0;
+  let qty = 0;
   cartItems.forEach((cartItem) => {
-   qty += cartItem.quantity;
+    qty += cartItem.quantity;
   });
   totalQuantityElement.innerText = qty;
 };
@@ -70,22 +69,22 @@ totalQuantity();
 // displays total product price
 
 const totalPrice = () => {
- let total = 0;
- cartItems.forEach((cartItem) => {
+  let total = 0;
+  cartItems.forEach((cartItem) => {
     fetch(`http://localhost:3000/api/products/${cartItem._id}`)
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-    })
-    .then((product) => {
-      total += cartItem.quantity * product.price;
-      totalPriceElement.innerText = total;
-    })
-    .catch((err) => {
-      cartItemsElement.innerHTML = `Une erreur est survenue: ${err}`;
-    });
- })
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        }
+      })
+      .then((product) => {
+        total += cartItem.quantity * product.price;
+        totalPriceElement.innerText = total;
+      })
+      .catch((err) => {
+        cartItemsElement.innerHTML = `Une erreur est survenue: ${err}`;
+      });
+  });
 };
 totalPrice();
 
@@ -135,3 +134,34 @@ const updateQuantity = () => {
     });
   });
 };
+
+// **************** form validation ******************
+
+const form = document.querySelector(".cart__order__form");
+
+// defines the reg exp rules for inputs
+
+let nameCityRegExp = /^[A-ZÀ-ß]{1}[\wÀ-ú'-\s]*$/g;
+let addressRegExp = /^[\wÀ-ú',-\s]*$/g;
+let emailRegExp = /^[\w.-]+[@]{1}[\w.-]+[.]{1}[a-z]{2,10}$/g;
+
+//listens to the input change, validates client's input
+
+const validInput = (input, regex) => {
+  input.addEventListener("change", (e) => {
+    e.preventDefault();
+    let testRegex = regex.test(input.value);
+    let errorMessage = input.nextElementSibling;
+    console.log(regex, input.value, testRegex);
+    if (!testRegex) {
+        errorMessage.innerHTML = "Saisie incorrecte";   
+    } else {
+        errorMessage.innerHTML = ""; 
+    }
+  });
+};
+validInput(form.firstName, nameCityRegExp);
+validInput(form.lastName, nameCityRegExp);
+validInput(form.address, addressRegExp);
+validInput(form.city, nameCityRegExp);
+validInput(form.email, emailRegExp);
