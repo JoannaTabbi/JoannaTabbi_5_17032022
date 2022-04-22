@@ -141,18 +141,17 @@ const form = document.querySelector(".cart__order__form");
 
 // defines the reg exp rules for inputs
 
-let nameCityRegExp = /^[A-ZÀ-ß]{1}[\wÀ-ú'-\s]*$/g;
-let addressRegExp = /^[\wÀ-ú',-\s]*$/g;
-let emailRegExp = /^[\w.-]+[@]{1}[\w.-]+[.]{1}[a-z]{2,10}$/g;
+let nameCityRegExp = new RegExp("^[A-ZÀ-ß]{1}[\\wÀ-ú'-\\s]*$", "g");
+let addressRegExp = new RegExp("^[\\wÀ-ú',-\\s]*$", "g");
+let emailRegExp = new RegExp("^[\\w.-]+[@]{1}[\\w.-]+[.]{1}[a-z]{2,10}$", "g");
 
 //listens to the input change, validates client's input
 
 const validInput = (input, regex) => {
   input.addEventListener("change", (e) => {
     e.preventDefault();
-    let testRegex = regex.test(input.value);
+    let testRegex = new RegExp(regex).test(input.value);
     let errorMessage = input.nextElementSibling;
-    console.log(regex, input.value, testRegex);
     if (!testRegex) {
         errorMessage.innerHTML = "Saisie incorrecte";   
     } else {
