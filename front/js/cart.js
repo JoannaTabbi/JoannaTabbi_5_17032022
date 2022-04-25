@@ -141,26 +141,85 @@ const form = document.querySelector(".cart__order__form");
 
 // defines the reg exp rules for inputs
 
-let nameCityRegExp = new RegExp("^[A-ZÀ-ß]{1}[\\wÀ-ú'-\\s]*$", "g");
-let addressRegExp = new RegExp("^[\\wÀ-ú',-\\s]*$", "g");
+let nameAddressRegExp = new RegExp("^[\\wÀ-ú',-\\s]*$", "g");
 let emailRegExp = new RegExp("^[\\w.-]+[@]{1}[\\w.-]+[.]{1}[a-z]{2,10}$", "g");
 
 //listens to the input change, validates client's input
 
-const validInput = (input, regex) => {
+const validInput = (input, regex, message) => {
+  let testRegex = new RegExp(regex).test(input.value);
+  let errorMessage = input.nextElementSibling;
+  if (!testRegex) {
+    errorMessage.innerHTML = message;
+    return false;
+  } else {
+    errorMessage.innerHTML = "";
+    return true;
+  }
+};
+
+const validInputOnChange = (input, regex, message) => {
   input.addEventListener("change", (e) => {
     e.preventDefault();
-    let testRegex = new RegExp(regex).test(input.value);
-    let errorMessage = input.nextElementSibling;
-    if (!testRegex) {
-        errorMessage.innerHTML = "Saisie incorrecte";   
-    } else {
-        errorMessage.innerHTML = ""; 
-    }
+    validInput(input, regex, message);
   });
 };
-validInput(form.firstName, nameCityRegExp);
-validInput(form.lastName, nameCityRegExp);
-validInput(form.address, addressRegExp);
-validInput(form.city, nameCityRegExp);
-validInput(form.email, emailRegExp);
+
+const nameAddressErrorMessage =
+  "Votre saisie ne doit pas contenir de caractères spéciaux, tels que @#&%...";
+const emailErrorMessage = "Votre adresse mail n'est pas valide";
+
+validInputOnChange(form.firstName, nameAddressRegExp, nameAddressErrorMessage);
+validInputOnChange(form.lastName, nameAddressRegExp, nameAddressErrorMessage);
+validInputOnChange(form.address, nameAddressRegExp, nameAddressErrorMessage);
+validInputOnChange(form.city, nameAddressRegExp, nameAddressErrorMessage);
+validInputOnChange(form.email, emailRegExp, emailErrorMessage);
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (
+    validInput(form.firstName, nameAddressRegExp, nameAddressErrorMessage) &&
+    validInput(form.lastName, nameAddressRegExp, nameAddressErrorMessage) &&
+    validInput(form.address, nameAddressRegExp, nameAddressErrorMessage) &&
+    validInput(form.city, nameAddressRegExp, nameAddressErrorMessage) &&
+    validInput(form.email, emailRegExp, emailErrorMessage)
+  ) {
+    sendForm();
+  } else {
+    console.log(
+      "Afin que votre commande soit prise en compte, merci de renseigner correctement tous les champs du formulaire."
+    );
+  }
+});
+
+// **************** form submit *******************
+
+const sendForm = () => {
+  // creates contact object
+
+  let contact = {
+    firstName: form.firstName.value,
+    lastName: form.lastName.value,
+    address: form.address.value,
+    city: form.city.value,
+    email: form.email.value,
+  };
+
+  // creates an array of strings of product-ID
+
+  let products = [];
+  cartItems.forEach((product) => {
+    products.push(product._id);
+  });
+
+  let command = { contact, products };
+
+  fetch(`http://localhost:3000/api/products/order`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(command),
+  });
+};
