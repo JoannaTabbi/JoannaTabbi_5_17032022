@@ -144,7 +144,7 @@ const form = document.querySelector(".cart__order__form");
 let nameAddressRegExp = new RegExp("^[\\wÀ-ú',-\\s]*$", "g");
 let emailRegExp = new RegExp("^[\\w.-]+[@]{1}[\\w.-]+[.]{1}[a-z]{2,10}$", "g");
 
-//listens to the input change, validates client's input
+// checks if client's input matches the regex
 
 const validInput = (input, regex, message) => {
   let testRegex = new RegExp(regex).test(input.value);
@@ -157,6 +157,8 @@ const validInput = (input, regex, message) => {
     return true;
   }
 };
+
+// validates input on change event
 
 const validInputOnChange = (input, regex, message) => {
   input.addEventListener("change", (e) => {
@@ -175,6 +177,10 @@ validInputOnChange(form.address, nameAddressRegExp, nameAddressErrorMessage);
 validInputOnChange(form.city, nameAddressRegExp, nameAddressErrorMessage);
 validInputOnChange(form.email, emailRegExp, emailErrorMessage);
 
+// **************** form submit *******************
+
+// submits form
+
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   if (
@@ -192,7 +198,7 @@ form.addEventListener("submit", (e) => {
   }
 });
 
-// **************** form submit *******************
+// send form function
 
 const sendForm = () => {
   // creates contact object
@@ -212,7 +218,9 @@ const sendForm = () => {
     products.push(product._id);
   });
 
-  let command = { contact, products };
+  let order = { contact, products };
+
+  //sends the order to the server
 
   fetch(`http://localhost:3000/api/products/order`, {
     method: "POST",
@@ -220,6 +228,6 @@ const sendForm = () => {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(command),
+    body: JSON.stringify(order),
   });
 };
