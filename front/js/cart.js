@@ -141,7 +141,7 @@ const form = document.querySelector(".cart__order__form");
 
 // defines the reg exp rules for inputs
 
-let nameAddressRegExp = new RegExp("^[\\wÀ-ú',-\\s]*$", "g");
+let nameAddressRegExp = new RegExp("^[\\wÀ-ú'-\\s]{2,}$", "g");
 let emailRegExp = new RegExp("^[\\w.-]+[@]{1}[\\w.-]+[.]{1}[a-z]{2,10}$", "g");
 
 // checks if client's input matches the regex
@@ -168,7 +168,7 @@ const validInputOnChange = (input, regex, message) => {
 };
 
 const nameAddressErrorMessage =
-  "Votre saisie ne doit pas contenir de caractères spéciaux, tels que @#&%...";
+  "Votre saisie doit contenir au moins deux caractères alphanumériques. Les tirets et les espaces sont acceptés.";
 const emailErrorMessage = "Votre adresse mail n'est pas valide";
 
 validInputOnChange(form.firstName, nameAddressRegExp, nameAddressErrorMessage);
@@ -192,7 +192,7 @@ form.addEventListener("submit", (e) => {
   ) {
     sendForm();
   } else {
-    console.log(
+    alert(
       "Afin que votre commande soit prise en compte, merci de renseigner correctement tous les champs du formulaire."
     );
   }
