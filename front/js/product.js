@@ -88,6 +88,9 @@ const addToCart = (product) => {
 const confirmationMessage = () => {
   const addToCartMessage = document.createElement("p");
   addToCartMessage.setAttribute("class", "item__confirmationMessage");
+  addToCartMessage.style.fontSize = "20px";
+  addToCartMessage.style.fontWeight = "600";
+  addToCartMessage.style.color = "#BCFBBC";
   addToCartMessage.innerText = "Votre produit a été ajouté au panier";
   document.querySelector(".item__content").appendChild(addToCartMessage);
   setTimeout('document.querySelector(".item__content").removeChild(document.querySelector(".item__confirmationMessage"))', 4000);

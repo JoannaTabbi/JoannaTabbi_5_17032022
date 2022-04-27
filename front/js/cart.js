@@ -9,7 +9,6 @@ const totalQuantityElement = document.getElementById("totalQuantity");
 const totalPriceElement = document.getElementById("totalPrice");
 
 cartItems.forEach((cartItem) => {
-
   //gets the product information from API
 
   fetch(`http://localhost:3000/api/products/${cartItem._id}`)
@@ -59,9 +58,9 @@ const cartDetails = (apiData, cartData) => {
 // displays total quantity
 
 const totalQuantity = () => {
-    let qty = 0;
+  let qty = 0;
   cartItems.forEach((cartItem) => {
-   qty += cartItem.quantity;
+    qty += cartItem.quantity;
   });
   totalQuantityElement.innerText = qty;
 };
@@ -70,22 +69,22 @@ totalQuantity();
 // displays total product price
 
 const totalPrice = () => {
- let total = 0;
- cartItems.forEach((cartItem) => {
+  let total = 0;
+  cartItems.forEach((cartItem) => {
     fetch(`http://localhost:3000/api/products/${cartItem._id}`)
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-    })
-    .then((product) => {
-      total += cartItem.quantity * product.price;
-      totalPriceElement.innerText = total;
-    })
-    .catch((err) => {
-      cartItemsElement.innerHTML = `Une erreur est survenue: ${err}`;
-    });
- })
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        }
+      })
+      .then((product) => {
+        total += cartItem.quantity * product.price;
+        totalPriceElement.innerText = total;
+      })
+      .catch((err) => {
+        cartItemsElement.innerHTML = `Une erreur est survenue: ${err}`;
+      });
+  });
 };
 totalPrice();
 
@@ -133,5 +132,102 @@ const updateQuantity = () => {
         totalPrice();
       }
     });
+  });
+};
+
+// **************** form validation ******************
+
+const form = document.querySelector(".cart__order__form");
+
+// defines the reg exp rules for inputs
+
+let nameAddressRegExp = new RegExp("^[\\wÀ-ú'-\\s]{2,}$", "g");
+let emailRegExp = new RegExp("^[\\w.-]+[@]{1}[\\w.-]+[.]{1}[a-z]{2,10}$", "g");
+
+// checks if client's input matches the regex
+
+const validInput = (input, regex, message) => {
+  let testRegex = new RegExp(regex).test(input.value);
+  let errorMessage = input.nextElementSibling;
+  if (!testRegex) {
+    errorMessage.innerHTML = message;
+    return false;
+  } else {
+    errorMessage.innerHTML = "";
+    return true;
+  }
+};
+
+// validates input on change event
+
+const validInputOnChange = (input, regex, message) => {
+  input.addEventListener("change", (e) => {
+    e.preventDefault();
+    validInput(input, regex, message);
+  });
+};
+
+const nameAddressErrorMessage =
+  "Votre saisie doit contenir au moins deux caractères alphanumériques. Les tirets et les espaces sont acceptés.";
+const emailErrorMessage = "Votre adresse mail n'est pas valide";
+
+validInputOnChange(form.firstName, nameAddressRegExp, nameAddressErrorMessage);
+validInputOnChange(form.lastName, nameAddressRegExp, nameAddressErrorMessage);
+validInputOnChange(form.address, nameAddressRegExp, nameAddressErrorMessage);
+validInputOnChange(form.city, nameAddressRegExp, nameAddressErrorMessage);
+validInputOnChange(form.email, emailRegExp, emailErrorMessage);
+
+// **************** form submit *******************
+
+// submits form
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (
+    validInput(form.firstName, nameAddressRegExp, nameAddressErrorMessage) &&
+    validInput(form.lastName, nameAddressRegExp, nameAddressErrorMessage) &&
+    validInput(form.address, nameAddressRegExp, nameAddressErrorMessage) &&
+    validInput(form.city, nameAddressRegExp, nameAddressErrorMessage) &&
+    validInput(form.email, emailRegExp, emailErrorMessage)
+  ) {
+    sendForm();
+  } else {
+    alert(
+      "Afin que votre commande soit prise en compte, merci de renseigner correctement tous les champs du formulaire."
+    );
+  }
+});
+
+// send form function
+
+const sendForm = () => {
+  // creates contact object
+
+  let contact = {
+    firstName: form.firstName.value,
+    lastName: form.lastName.value,
+    address: form.address.value,
+    city: form.city.value,
+    email: form.email.value,
+  };
+
+  // creates an array of strings of product-ID
+
+  let products = [];
+  cartItems.forEach((product) => {
+    products.push(product._id);
+  });
+
+  let order = { contact, products };
+
+  //sends the order to the server
+
+  fetch(`http://localhost:3000/api/products/order`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(order),
   });
 };
