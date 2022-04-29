@@ -229,5 +229,17 @@ const sendForm = () => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(order),
-  });
+  })
+  .then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+  })
+  .then((data) => {
+    window.location.href = `./confirmation.html?orderId=${data.orderId}`;
+    localStorage.clear()  //deletes localStorage content
+  })
+  .catch((err) => {
+    alert(`Une erreur est survenue: ${err}`);
+  })
 };
