@@ -246,7 +246,7 @@ const sendForm = () => {
       }
     })
     .then((data) => {
-      window.location.href = `./confirmation.html?orderId=${data.orderId}`;
+      window.location.href = `./confirmation.html?orderId=${data.orderId}#orderId`;
       localStorage.clear(); //deletes localStorage content
     })
     .catch((err) => {
