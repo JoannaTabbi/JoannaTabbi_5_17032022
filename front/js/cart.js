@@ -168,10 +168,12 @@ const validInputOnChange = (input, regex, message) => {
   });
 };
 
-const nameCityErrorMessage = "Votre saisie doit contenir au moins deux caractères, dont lettres, tirets, espaces ou apostrophes."
+const nameCityErrorMessage =
+  "Votre saisie doit contenir au moins deux caractères, dont lettres, tirets, espaces ou apostrophes.";
 const addressErrorMessage =
   "Votre saisie doit contenir au moins deux caractères alphanumériques. Les tirets, espaces et apostrophes sont acceptés.";
-const emailErrorMessage = "Votre adresse email doit avoir un format valide, ex.: abc@domaine.com";
+const emailErrorMessage =
+  "Votre adresse email doit avoir un format valide, ex.: abc@domaine.com";
 
 validInputOnChange(form.firstName, nameCityRegExp, nameCityErrorMessage);
 validInputOnChange(form.lastName, nameCityRegExp, nameCityErrorMessage);
@@ -185,18 +187,24 @@ validInputOnChange(form.email, emailRegExp, emailErrorMessage);
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();
-  if (
-    validInput(form.firstName, nameCityRegExp, nameCityErrorMessage) &&
-    validInput(form.lastName, nameCityRegExp, nameCityErrorMessage) &&
-    validInput(form.address, addressRegExp, addressErrorMessage) &&
-    validInput(form.city, nameCityRegExp, nameCityErrorMessage) &&
-    validInput(form.email, emailRegExp, emailErrorMessage)
-  ) {
-    sendForm();
-  } else {
+  if (cartItems == "") {
     alert(
-      "Afin que votre commande soit prise en compte, merci de renseigner correctement tous les champs du formulaire."
+      "Votre commande n'a pas été prise en compte. Merci de vérifier votre panier"
     );
+  } else {
+    if (
+      validInput(form.firstName, nameCityRegExp, nameCityErrorMessage) &&
+      validInput(form.lastName, nameCityRegExp, nameCityErrorMessage) &&
+      validInput(form.address, addressRegExp, addressErrorMessage) &&
+      validInput(form.city, nameCityRegExp, nameCityErrorMessage) &&
+      validInput(form.email, emailRegExp, emailErrorMessage)
+    ) {
+      sendForm();
+    } else {
+      alert(
+        "Afin que votre commande soit prise en compte, merci de renseigner correctement tous les champs du formulaire."
+      );
+    }
   }
 });
 
@@ -232,16 +240,16 @@ const sendForm = () => {
     },
     body: JSON.stringify(order),
   })
-  .then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-  })
-  .then((data) => {
-    window.location.href = `./confirmation.html?orderId=${data.orderId}`;
-    localStorage.clear()  //deletes localStorage content
-  })
-  .catch((err) => {
-    alert(`Une erreur est survenue: ${err}`);
-  })
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      }
+    })
+    .then((data) => {
+      window.location.href = `./confirmation.html?orderId=${data.orderId}`;
+      localStorage.clear(); //deletes localStorage content
+    })
+    .catch((err) => {
+      alert(`Une erreur est survenue: ${err}`);
+    });
 };
