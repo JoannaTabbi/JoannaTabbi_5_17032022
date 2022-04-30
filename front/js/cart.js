@@ -141,7 +141,8 @@ const form = document.querySelector(".cart__order__form");
 
 // defines the reg exp rules for inputs
 
-let nameAddressRegExp = new RegExp("^[\\wÀ-ú'-\\s]{2,}$", "g");
+let nameCityRegExp = new RegExp("^[A-Za-zÀ-ú'-\\s]{2,}$", "g");
+let addressRegExp = new RegExp("^[\\wÀ-ú'-\\s]{2,}$", "g");
 let emailRegExp = new RegExp("^[\\w.-]+[@]{1}[\\w.-]+[.]{1}[a-z]{2,10}$", "g");
 
 // checks if client's input matches the regex
@@ -167,14 +168,15 @@ const validInputOnChange = (input, regex, message) => {
   });
 };
 
-const nameAddressErrorMessage =
-  "Votre saisie doit contenir au moins deux caractères alphanumériques. Les tirets et les espaces sont acceptés.";
-const emailErrorMessage = "Votre adresse mail n'est pas valide";
+const nameCityErrorMessage = "Votre saisie doit contenir au moins deux caractères, dont lettres, tirets, espaces ou apostrophes."
+const addressErrorMessage =
+  "Votre saisie doit contenir au moins deux caractères alphanumériques. Les tirets, espaces et apostrophes sont acceptés.";
+const emailErrorMessage = "Votre adresse email doit avoir un format valide, ex.: abc@domaine.com";
 
-validInputOnChange(form.firstName, nameAddressRegExp, nameAddressErrorMessage);
-validInputOnChange(form.lastName, nameAddressRegExp, nameAddressErrorMessage);
-validInputOnChange(form.address, nameAddressRegExp, nameAddressErrorMessage);
-validInputOnChange(form.city, nameAddressRegExp, nameAddressErrorMessage);
+validInputOnChange(form.firstName, nameCityRegExp, nameCityErrorMessage);
+validInputOnChange(form.lastName, nameCityRegExp, nameCityErrorMessage);
+validInputOnChange(form.address, addressRegExp, addressErrorMessage);
+validInputOnChange(form.city, nameCityRegExp, nameCityErrorMessage);
 validInputOnChange(form.email, emailRegExp, emailErrorMessage);
 
 // **************** form submit *******************
@@ -184,10 +186,10 @@ validInputOnChange(form.email, emailRegExp, emailErrorMessage);
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   if (
-    validInput(form.firstName, nameAddressRegExp, nameAddressErrorMessage) &&
-    validInput(form.lastName, nameAddressRegExp, nameAddressErrorMessage) &&
-    validInput(form.address, nameAddressRegExp, nameAddressErrorMessage) &&
-    validInput(form.city, nameAddressRegExp, nameAddressErrorMessage) &&
+    validInput(form.firstName, nameCityRegExp, nameCityErrorMessage) &&
+    validInput(form.lastName, nameCityRegExp, nameCityErrorMessage) &&
+    validInput(form.address, addressRegExp, addressErrorMessage) &&
+    validInput(form.city, nameCityRegExp, nameCityErrorMessage) &&
     validInput(form.email, emailRegExp, emailErrorMessage)
   ) {
     sendForm();
