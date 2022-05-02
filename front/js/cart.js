@@ -8,9 +8,11 @@ const cartItemsElement = document.getElementById("cart__items");
 const totalQuantityElement = document.getElementById("totalQuantity");
 const totalPriceElement = document.getElementById("totalPrice");
 
-cartItems.forEach((cartItem) => {
-  //gets the product information from API
+//gets the product information from API for the items stocked in the cart
 
+let getProductFromAPI = () => {
+
+cartItems.forEach((cartItem) => {
   fetch(`http://localhost:3000/api/products/${cartItem._id}`)
     .then((res) => {
       if (res.ok) {
@@ -27,6 +29,16 @@ cartItems.forEach((cartItem) => {
       cartItemsElement.innerHTML = `Une erreur est survenue: ${err}`;
     });
 });
+}
+
+// if the cart is empty, displays a message and redirects the user to the homepage;
+
+if (cartItems == "") {
+    cartItemsElement.innerText = "Votre panier est vide. Vous allez être redirigé vers la page d'accueil.";
+    setTimeout('window.location.href = "./index.html"', 4000);
+} else {
+    getProductFromAPI();
+}
 
 // displays the details of each cart item
 
@@ -55,7 +67,7 @@ const cartDetails = (apiData, cartData) => {
   return cartItemsHtml;
 };
 
-// displays total quantity
+// calculates total quantity of products
 
 const totalQuantity = () => {
   let qty = 0;
@@ -66,7 +78,7 @@ const totalQuantity = () => {
 };
 totalQuantity();
 
-// displays total product price
+// calculates total product price
 
 const totalPrice = () => {
   let total = 0;
@@ -159,7 +171,7 @@ const validInput = (input, regex, message) => {
   }
 };
 
-// validates input on change event
+// validates input on change, displays a personalized error message if the input is incorrect 
 
 const validInputOnChange = (input, regex, message) => {
   input.addEventListener("change", (e) => {
@@ -183,35 +195,25 @@ validInputOnChange(form.email, emailRegExp, emailErrorMessage);
 
 // **************** form submit *******************
 
-// submits form
+// submits form only if all the inputs are correctly fulfilled
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();
-  if (cartItems == "") {
-    alert(
-      "Votre commande n'a pas été prise en compte. Merci de vérifier votre panier"
-    );
-  } else {
-    if (
+  if (
       validInput(form.firstName, nameCityRegExp, nameCityErrorMessage) &&
       validInput(form.lastName, nameCityRegExp, nameCityErrorMessage) &&
       validInput(form.address, addressRegExp, addressErrorMessage) &&
       validInput(form.city, nameCityRegExp, nameCityErrorMessage) &&
       validInput(form.email, emailRegExp, emailErrorMessage)
     ) {
-      sendForm();
-    } else {
-      alert(
-        "Afin que votre commande soit prise en compte, merci de renseigner correctement tous les champs du formulaire."
-      );
+      sendOrder();
     }
-  }
 });
 
-// send form function
+/* creates an order : contact object containing the information from inputs and
+an array of strings of product IDs, then sends it to the server */
 
-const sendForm = () => {
-  // creates contact object
+const sendOrder = () => {
 
   let contact = {
     firstName: form.firstName.value,
@@ -220,17 +222,8 @@ const sendForm = () => {
     city: form.city.value,
     email: form.email.value,
   };
-
-  // creates an array of strings of product-ID
-
-  let products = [];
-  cartItems.forEach((product) => {
-    products.push(product._id);
-  });
-
+  let products = cartItems.map(item => item._id);
   let order = { contact, products };
-
-  //sends the order to the server
 
   fetch(`http://localhost:3000/api/products/order`, {
     method: "POST",
@@ -246,8 +239,9 @@ const sendForm = () => {
       }
     })
     .then((data) => {
-      window.location.href = `./confirmation.html?orderId=${data.orderId}#orderId`;
       localStorage.clear(); //deletes localStorage content
+      window.location.href = `./confirmation.html?orderId=${data.orderId}#orderId`;
+      //redirects user client to the confirmation page
     })
     .catch((err) => {
       alert(`Une erreur est survenue: ${err}`);

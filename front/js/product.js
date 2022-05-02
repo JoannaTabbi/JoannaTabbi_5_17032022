@@ -1,6 +1,6 @@
 import * as index from "./index.js";
 
-// gets the id of one product
+// gets the id of one product from the url of the page
 
 const urlSearchParams = new URLSearchParams(window.location.search);
 const productId = urlSearchParams.get("id");

@@ -1,3 +1,5 @@
+// gets the information from the server of all the available items, and displays them on the home page
+
 fetch("http://localhost:3000/api/products")
   .then((res) => {
     if (res.ok) {
