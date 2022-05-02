@@ -11,33 +11,33 @@ const totalPriceElement = document.getElementById("totalPrice");
 //gets the product information from API for the items stocked in the cart
 
 let getProductFromAPI = () => {
+  cartItems.forEach((cartItem) => {
+    fetch(`http://localhost:3000/api/products/${cartItem._id}`)
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        }
+      })
+      .then((product) => {
+        cartItemsElement.innerHTML = cartDetails(product, cartItem);
+        deleteFromCart();
+        updateQuantity();
+      })
 
-cartItems.forEach((cartItem) => {
-  fetch(`http://localhost:3000/api/products/${cartItem._id}`)
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-    })
-    .then((product) => {
-      cartItemsElement.innerHTML = cartDetails(product, cartItem);
-      deleteFromCart();
-      updateQuantity();
-    })
-
-    .catch((err) => {
-      cartItemsElement.innerHTML = `Une erreur est survenue: ${err}`;
-    });
-});
-}
+      .catch((err) => {
+        cartItemsElement.innerHTML = `Une erreur est survenue: ${err}`;
+      });
+  });
+};
 
 // if the cart is empty, displays a message and redirects the user to the homepage;
 
 if (cartItems == "") {
-    cartItemsElement.innerText = "Votre panier est vide. Vous allez être redirigé vers la page d'accueil.";
-    setTimeout('window.location.href = "./index.html"', 4000);
+  cartItemsElement.innerText =
+    "Votre panier est vide. Vous allez être redirigé vers la page d'accueil.";
+  setTimeout('window.location.href = "./index.html"', 4000);
 } else {
-    getProductFromAPI();
+  getProductFromAPI();
 }
 
 // displays the details of each cart item
@@ -171,7 +171,7 @@ const validInput = (input, regex, message) => {
   }
 };
 
-// validates input on change, displays a personalized error message if the input is incorrect 
+// validates input on change, displays a personalized error message if the input is incorrect
 
 const validInputOnChange = (input, regex, message) => {
   input.addEventListener("change", (e) => {
@@ -200,21 +200,20 @@ validInputOnChange(form.email, emailRegExp, emailErrorMessage);
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   if (
-      validInput(form.firstName, nameCityRegExp, nameCityErrorMessage) &&
-      validInput(form.lastName, nameCityRegExp, nameCityErrorMessage) &&
-      validInput(form.address, addressRegExp, addressErrorMessage) &&
-      validInput(form.city, nameCityRegExp, nameCityErrorMessage) &&
-      validInput(form.email, emailRegExp, emailErrorMessage)
-    ) {
-      sendOrder();
-    }
+    validInput(form.firstName, nameCityRegExp, nameCityErrorMessage) &&
+    validInput(form.lastName, nameCityRegExp, nameCityErrorMessage) &&
+    validInput(form.address, addressRegExp, addressErrorMessage) &&
+    validInput(form.city, nameCityRegExp, nameCityErrorMessage) &&
+    validInput(form.email, emailRegExp, emailErrorMessage)
+  ) {
+    sendOrder();
+  }
 });
 
 /* creates an order : contact object containing the information from inputs and
 an array of strings of product IDs, then sends it to the server */
 
 const sendOrder = () => {
-
   let contact = {
     firstName: form.firstName.value,
     lastName: form.lastName.value,
@@ -222,7 +221,7 @@ const sendOrder = () => {
     city: form.city.value,
     email: form.email.value,
   };
-  let products = cartItems.map(item => item._id);
+  let products = cartItems.map((item) => item._id);
   let order = { contact, products };
 
   fetch(`http://localhost:3000/api/products/order`, {
