@@ -91,7 +91,7 @@ addToCartMessage.style.fontWeight = "600";
 addToCartMessage.style.color = "#BCFBBC";
 document.querySelector(".item__content").appendChild(addToCartMessage);
 
-//  displays the confirmation than the product has been added to the cart
+//  displays the confirmation that the product has been added to the cart
 
 const confirmationMessage = () => {
   addToCartMessage.innerText = "Votre produit a été ajouté au panier";

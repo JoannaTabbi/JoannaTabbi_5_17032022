@@ -16,4 +16,4 @@ console when the server starts, e.g. `Listening on port 3001`.
 
 ### Front ###
 
-Please launch a development local Server, eg. `Live Server` to enable module type scripts.
+Browse the pages on a local web Server, eg. `Live Server` to enable module type scripts.
