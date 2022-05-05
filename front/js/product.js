@@ -82,21 +82,8 @@ const addToCart = (product) => {
   });
 };
 
-// creates a new paragraph for confirmation message
-
-const addToCartMessage = document.createElement("p");
-addToCartMessage.setAttribute("class", "item__confirmationMessage");
-addToCartMessage.style.fontSize = "20px";
-addToCartMessage.style.fontWeight = "600";
-addToCartMessage.style.color = "#BCFBBC";
-document.querySelector(".item__content").appendChild(addToCartMessage);
-
 //  displays the confirmation that the product has been added to the cart
 
 const confirmationMessage = () => {
-  addToCartMessage.innerText = "Votre produit a été ajouté au panier";
-  setTimeout(
-    'document.querySelector(".item__confirmationMessage").innerText = ""',
-    2000
-  );
+  alert("Votre produit a été ajouté au panier");
 };

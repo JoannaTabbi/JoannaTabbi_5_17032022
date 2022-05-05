@@ -34,8 +34,9 @@ let getProductFromAPI = () => {
 
 if (cartItems == "") {
   cartItemsElement.innerText =
-    "Votre panier est vide. Vous allez être redirigé vers la page d'accueil.";
-  setTimeout('window.location.href = "./index.html"', 4000);
+    "Votre panier est vide. Rendez-vous sur la page d'accueil de notre site et faites votre choix parmi nos modèles KANAP disponibles.";
+    document.getElementsByClassName("cart__price")[0].remove();
+    document.getElementsByClassName("cart__order")[0].remove();
 } else {
   getProductFromAPI();
 }
