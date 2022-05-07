@@ -8,25 +8,38 @@ const cartItemsElement = document.getElementById("cart__items");
 const totalQuantityElement = document.getElementById("totalQuantity");
 const totalPriceElement = document.getElementById("totalPrice");
 
-cartItems.forEach((cartItem) => {
-  //gets the product information from API
+//gets the product information from API for the items stocked in the cart
 
-  fetch(`http://localhost:3000/api/products/${cartItem._id}`)
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-    })
-    .then((product) => {
-      cartItemsElement.innerHTML = cartDetails(product, cartItem);
-      deleteFromCart();
-      updateQuantity();
-    })
+let getProductFromAPI = () => {
+  cartItems.forEach((cartItem) => {
+    fetch(`http://localhost:3000/api/products/${cartItem._id}`)
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        }
+      })
+      .then((product) => {
+        cartItemsElement.innerHTML = cartDetails(product, cartItem);
+        deleteFromCart();
+        updateQuantity();
+      })
 
-    .catch((err) => {
-      cartItemsElement.innerHTML = `Une erreur est survenue: ${err}`;
-    });
-});
+      .catch((err) => {
+        cartItemsElement.innerHTML = `Une erreur est survenue: ${err}`;
+      });
+  });
+};
+
+// if the cart is empty, displays a message and redirects the user to the homepage;
+
+if (cartItems == "") {
+  cartItemsElement.innerText =
+    "Votre panier est vide. Rendez-vous sur la page d'accueil de notre site et faites votre choix parmi nos modèles KANAP disponibles.";
+  document.getElementsByClassName("cart__price")[0].remove();
+  document.getElementsByClassName("cart__order")[0].remove();
+} else {
+  getProductFromAPI();
+}
 
 // displays the details of each cart item
 
@@ -55,7 +68,7 @@ const cartDetails = (apiData, cartData) => {
   return cartItemsHtml;
 };
 
-// displays total quantity
+// calculates total quantity of products
 
 const totalQuantity = () => {
   let qty = 0;
@@ -66,7 +79,7 @@ const totalQuantity = () => {
 };
 totalQuantity();
 
-// displays total product price
+// calculates total product price
 
 const totalPrice = () => {
   let total = 0;
@@ -141,7 +154,8 @@ const form = document.querySelector(".cart__order__form");
 
 // defines the reg exp rules for inputs
 
-let nameAddressRegExp = new RegExp("^[\\wÀ-ú'-\\s]{2,}$", "g");
+let nameCityRegExp = new RegExp("^[A-Za-zÀ-ú'-\\s]{2,}$", "g");
+let addressRegExp = new RegExp("^[\\wÀ-ú'-\\s]{2,}$", "g");
 let emailRegExp = new RegExp("^[\\w.-]+[@]{1}[\\w.-]+[.]{1}[a-z]{2,10}$", "g");
 
 // checks if client's input matches the regex
@@ -158,7 +172,7 @@ const validInput = (input, regex, message) => {
   }
 };
 
-// validates input on change event
+// validates input on change, displays a personalized error message if the input is incorrect
 
 const validInputOnChange = (input, regex, message) => {
   input.addEventListener("change", (e) => {
@@ -167,42 +181,40 @@ const validInputOnChange = (input, regex, message) => {
   });
 };
 
-const nameAddressErrorMessage =
-  "Votre saisie doit contenir au moins deux caractères alphanumériques. Les tirets et les espaces sont acceptés.";
-const emailErrorMessage = "Votre adresse mail n'est pas valide";
+const nameCityErrorMessage =
+  "Votre saisie doit contenir au moins deux caractères, dont lettres, tirets, espaces ou apostrophes.";
+const addressErrorMessage =
+  "Votre saisie doit contenir au moins deux caractères alphanumériques. Les tirets, espaces et apostrophes sont acceptés.";
+const emailErrorMessage =
+  "Votre adresse email doit avoir un format valide, ex.: abc@domaine.com";
 
-validInputOnChange(form.firstName, nameAddressRegExp, nameAddressErrorMessage);
-validInputOnChange(form.lastName, nameAddressRegExp, nameAddressErrorMessage);
-validInputOnChange(form.address, nameAddressRegExp, nameAddressErrorMessage);
-validInputOnChange(form.city, nameAddressRegExp, nameAddressErrorMessage);
+validInputOnChange(form.firstName, nameCityRegExp, nameCityErrorMessage);
+validInputOnChange(form.lastName, nameCityRegExp, nameCityErrorMessage);
+validInputOnChange(form.address, addressRegExp, addressErrorMessage);
+validInputOnChange(form.city, nameCityRegExp, nameCityErrorMessage);
 validInputOnChange(form.email, emailRegExp, emailErrorMessage);
 
 // **************** form submit *******************
 
-// submits form
+// submits form only if all the inputs are correctly fulfilled
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   if (
-    validInput(form.firstName, nameAddressRegExp, nameAddressErrorMessage) &&
-    validInput(form.lastName, nameAddressRegExp, nameAddressErrorMessage) &&
-    validInput(form.address, nameAddressRegExp, nameAddressErrorMessage) &&
-    validInput(form.city, nameAddressRegExp, nameAddressErrorMessage) &&
+    validInput(form.firstName, nameCityRegExp, nameCityErrorMessage) &&
+    validInput(form.lastName, nameCityRegExp, nameCityErrorMessage) &&
+    validInput(form.address, addressRegExp, addressErrorMessage) &&
+    validInput(form.city, nameCityRegExp, nameCityErrorMessage) &&
     validInput(form.email, emailRegExp, emailErrorMessage)
   ) {
-    sendForm();
-  } else {
-    alert(
-      "Afin que votre commande soit prise en compte, merci de renseigner correctement tous les champs du formulaire."
-    );
+    sendOrder();
   }
 });
 
-// send form function
+/* creates an order : contact object containing the information from inputs and
+an array of strings of product IDs, then sends it to the server */
 
-const sendForm = () => {
-  // creates contact object
-
+const sendOrder = () => {
   let contact = {
     firstName: form.firstName.value,
     lastName: form.lastName.value,
@@ -210,17 +222,8 @@ const sendForm = () => {
     city: form.city.value,
     email: form.email.value,
   };
-
-  // creates an array of strings of product-ID
-
-  let products = [];
-  cartItems.forEach((product) => {
-    products.push(product._id);
-  });
-
+  let products = cartItems.map((item) => item._id);
   let order = { contact, products };
-
-  //sends the order to the server
 
   fetch(`http://localhost:3000/api/products/order`, {
     method: "POST",
@@ -229,5 +232,18 @@ const sendForm = () => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(order),
-  });
+  })
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      }
+    })
+    .then((data) => {
+      localStorage.clear(); //deletes localStorage content
+      window.location.href = `./confirmation.html?orderId=${data.orderId}#orderId`;
+      //redirects user client to the confirmation page
+    })
+    .catch((err) => {
+      alert(`Une erreur est survenue: ${err}`);
+    });
 };

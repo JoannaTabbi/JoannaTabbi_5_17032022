@@ -14,7 +14,7 @@ export const getCart = () => {
 export const setCart = (cart) =>
   localStorage.setItem("cart", JSON.stringify(cart));
 
-// sort products by their name then color
+// sorts products by their name then by their color
 
 export const orderedList = (products) => {
   const orderedData = products.sort((a, b) => {

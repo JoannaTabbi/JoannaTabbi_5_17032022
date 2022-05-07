@@ -1,11 +1,11 @@
 import * as index from "./index.js";
 
-// gets the id of one product
+// gets the id of one product from the url of the page
 
 const urlSearchParams = new URLSearchParams(window.location.search);
 const productId = urlSearchParams.get("id");
 
-// gets the product data & implements the data into product page
+// gets the product data from the API & implements the data into product page
 
 fetch(`http://localhost:3000/api/products/${productId}`)
   .then((res) => {
@@ -64,9 +64,8 @@ const productMatch = (product) => {
 };
 
 // adds the product to the cart while clicking on the add-to-cart button
-
+const addToCartButton = document.getElementById("addToCart");
 const addToCart = (product) => {
-  const addToCartButton = document.getElementById("addToCart");
   addToCartButton.addEventListener("click", (event) => {
     event.preventDefault();
     let selectedColor = document.getElementById("colors").value;
@@ -83,15 +82,8 @@ const addToCart = (product) => {
   });
 };
 
-// displays the confirmation than the product has been added to the cart
+//  displays the confirmation that the product has been added to the cart
 
 const confirmationMessage = () => {
-  const addToCartMessage = document.createElement("p");
-  addToCartMessage.setAttribute("class", "item__confirmationMessage");
-  addToCartMessage.style.fontSize = "20px";
-  addToCartMessage.style.fontWeight = "600";
-  addToCartMessage.style.color = "#BCFBBC";
-  addToCartMessage.innerText = "Votre produit a été ajouté au panier";
-  document.querySelector(".item__content").appendChild(addToCartMessage);
-  setTimeout('document.querySelector(".item__content").removeChild(document.querySelector(".item__confirmationMessage"))', 4000);
+  alert("Votre produit a été ajouté au panier");
 };
